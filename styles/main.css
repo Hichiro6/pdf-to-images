@@ -824,6 +824,16 @@ input[type="range"]::-moz-range-thumb {
   margin-top: auto;
 }
 
+.footer__privacy {
+  margin-bottom: 1rem;
+}
+
+.footer__privacy .badge {
+  display: inline-block;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.9rem;
+}
+
 .footer__links {
   display: flex;
   align-items: center;
