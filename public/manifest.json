@@ -1,0 +1,21 @@
+{
+  "name": "PDF to Images",
+  "short_name": "PDF to Images",
+  "description": "Extract PDF pages as images in your browser. Choose order, format, and quality. 100% local, your files never leave your browser.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#08090a",
+  "theme_color": "#08090a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
+  "lang": "en-US"
+}

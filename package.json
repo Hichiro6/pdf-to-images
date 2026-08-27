@@ -20,6 +20,7 @@
     "test:report": "npx playwright show-report tests/e2e/results/report"
   },
   "dependencies": {
+    "fflate": "^0.8.2",
     "pdf-lib": "1.17.1",
     "pdfjs-dist": "6.2.108"
   },
