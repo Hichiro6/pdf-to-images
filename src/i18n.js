@@ -74,7 +74,7 @@ export const TRANSLATIONS = {
     'pages.custom': 'Plage personnalisée',
     'btn.convert': 'Convertir en images',
     'btn.reset': 'Réinitialiser',
-    'btn.download': 'Télécharger l\'image',
+    'btn.download': "Télécharger l'image",
     'btn.downloadZip': 'Télécharger le ZIP',
     'btn.selectFile': 'Sélectionner un PDF',
     'alerts.noFile': 'Veuillez sélectionner un fichier PDF.',
@@ -185,20 +185,20 @@ export const TRANSLATIONS = {
 
   nl: {
     'app.title': 'PDF to Images — Converteer uw PDF naar afbeeldingen',
-    'header.tagline': 'Converteer PDF-pagina\'s naar afbeeldingen in uw browser',
+    'header.tagline': "Converteer PDF-pagina's naar afbeeldingen in uw browser",
     'privacy.badge': '🔒 100% lokaal — uw bestanden verlaten nooit uw browser',
     'dropzone.title': 'Sleep uw PDF hierheen',
     'dropzone.subtitle': 'of klik om een bestand te selecteren',
     'controls.format': 'Uitvoerformaat',
     'controls.quality': 'Kwaliteit',
     'controls.scale': 'Schaal / DPI',
-    'controls.pages': 'Te converteren pagina\'s',
+    'controls.pages': "Te converteren pagina's",
     'format.png': 'PNG — Verliesvrij, grotere bestanden',
     'format.jpg': 'JPEG — Kleinere bestanden, instelbare kwaliteit',
     'quality.low': 'Laag — Sneller, kleiner',
     'quality.medium': 'Gemiddeld — Gebalanceerd',
     'quality.high': 'Hoog — Betere kwaliteit, groter',
-    'pages.all': 'Alle pagina\'s',
+    'pages.all': "Alle pagina's",
     'pages.custom': 'Aangepast bereik',
     'btn.convert': 'Converteren naar afbeeldingen',
     'btn.reset': 'Opnieuw',
@@ -321,7 +321,7 @@ export function setLanguage(lang, callback) {
 
   try {
     localStorage.setItem(STORAGE_KEY, lang);
-  } catch (e) {
+  } catch (_e) {
     // localStorage might be unavailable (private browsing)
   }
 
@@ -389,7 +389,7 @@ export function initI18n() {
 
   try {
     savedLang = localStorage.getItem(STORAGE_KEY) || 'en';
-  } catch (e) {
+  } catch (_e) {
     // localStorage unavailable
   }
 
