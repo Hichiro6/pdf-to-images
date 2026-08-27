@@ -1,4 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -27,6 +32,9 @@ export default defineConfig({
   expect: {
     timeout: 10000,
   },
+  
+  // Global setup to inject French locale
+  globalSetup: './globalSetup.js',
   
   // Shared settings for all tests
   use: {

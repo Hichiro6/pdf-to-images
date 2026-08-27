@@ -1,0 +1,9 @@
+# Generated test fixtures
+fixtures/
+# Test results and artifacts
+results/
+artifacts/
+# Downloads from tests
+downloads/
+# Setup scripts
+setup/
