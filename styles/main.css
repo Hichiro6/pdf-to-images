@@ -1,5 +1,5 @@
 /**
- * WaterMark — Design System inspiré de Linear
+ * WaterMark — Design System Unifié (WaterMark charte)
  * Adapté pour accessibilité (utilisateurs jeunes et âgés)
  * 
  * - Contrastes élevés (ratio > 4.5:1)
@@ -22,7 +22,7 @@
   --text-quaternary: #62666d;
   
   --brand-indigo: #5e6ad2;
-  --brand-accent: #7170ff;
+  --brand-accent: #9a9bff;
   --brand-hover: #828fff;
   
   --border-subtle: rgba(255,255,255,0.05);
@@ -165,7 +165,7 @@ body {
 .dropzone__inner:hover,
 .dropzone.dragover .dropzone__inner {
   border-color: var(--brand-accent);
-  background: rgba(113, 112, 255, 0.05);
+  background: rgba(154, 155, 255, 0.05);
   color: var(--brand-accent);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -377,7 +377,7 @@ body {
   font-weight: 590;
   color: var(--brand-accent);
   font-size: 0.85rem;
-  background: rgba(113, 112, 255, 0.1);
+  background: rgba(154, 155, 255, 0.1);
   padding: 0.15rem 0.6rem;
   border-radius: 4px;
 }
@@ -400,7 +400,7 @@ textarea, input[type="text"] {
 textarea:focus, input[type="text"]:focus {
   outline: none;
   border-color: var(--brand-accent);
-  box-shadow: 0 0 0 3px rgba(113, 112, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(154, 155, 255, 0.15);
 }
 
 textarea::placeholder, input::placeholder {
@@ -529,7 +529,7 @@ input[type="range"]::-moz-range-thumb {
 
 .preset-btn:hover {
   border-color: var(--brand-accent);
-  background: rgba(113, 112, 255, 0.08);
+  background: rgba(154, 155, 255, 0.08);
   transform: translateY(-1px);
 }
 
@@ -717,7 +717,7 @@ input[type="range"]::-moz-range-thumb {
 .date-mode:focus {
   outline: none;
   border-color: var(--brand-accent);
-  box-shadow: 0 0 0 3px rgba(113, 112, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(154, 155, 255, 0.15);
 }
 
 .date-input {
@@ -735,7 +735,7 @@ input[type="range"]::-moz-range-thumb {
 .date-input:focus {
   outline: none;
   border-color: var(--brand-accent);
-  box-shadow: 0 0 0 3px rgba(113, 112, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(154, 155, 255, 0.15);
 }
 
 .date-input:disabled {
@@ -768,7 +768,7 @@ input[type="range"]::-moz-range-thumb {
 .date-preset-btn:hover {
   border-color: var(--brand-accent);
   color: var(--brand-accent);
-  background: rgba(113, 112, 255, 0.08);
+  background: rgba(154, 155, 255, 0.08);
 }
 
 .date-preset-btn.active {
