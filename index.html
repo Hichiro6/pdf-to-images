@@ -7,17 +7,17 @@
   <meta name="theme-color" content="#08090a" />
 
   <!-- PWA -->
-  <link rel="manifest" href="/manifest.json" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
 
   <!-- iOS web app -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="PDF to Images" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
   <title>PDF to Images — Convert your PDF to images</title>
 
-  <link rel="stylesheet" href="/styles/main.css" />
+  <link rel="stylesheet" href="./styles/main.css" />
 </head>
 <body>
   <div class="app">
@@ -47,14 +47,13 @@
         <input type="file" id="file-input" accept=".pdf,application/pdf" class="file-input-hidden" aria-label="Select PDF file" />
       </div>
     </section>
-
     <!-- Workspace -->
     <section class="workspace" id="workspace" hidden>
       <!-- Left: Page thumbnails -->
       <div class="workspace__preview">
         <div class="workspace__preview-header">
           <span class="filename" id="filename">Loading...</span>
-          <button class="btn btn--ghost" id="btn-reset" title="Start over" aria-label="Reset and start over">
+          <button type="button" class="btn btn--ghost" id="btn-reset" title="Start over" aria-label="Reset and start over">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M14 4L4 14M4 4L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
         </div>
@@ -67,16 +66,16 @@
       <div class="controls">
         <!-- Output format -->
         <div class="control-group">
-          <h3 class="control-group__title" data-i18n="controls.format" tabindex="0" role="button" aria-expanded="true">
+          <h3 class="control-group__title" tabindex="0" role="button" aria-expanded="true">
             <span data-i18n="controls.format">Output format</span>
             <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </h3>
           <div class="control-group__body">
             <div class="seg-control" role="radiogroup" aria-label="Output format">
-              <button class="seg-btn active" data-format="png" role="radio" aria-checked="true" tabindex="0">
+              <button type="button" class="seg-btn active" data-format="png" role="radio" aria-checked="true" tabindex="0">
                 <span data-i18n="format.png">PNG — Lossless, larger files</span>
               </button>
-              <button class="seg-btn" data-format="jpg" role="radio" aria-checked="false" tabindex="-1">
+              <button type="button" class="seg-btn" data-format="jpg" role="radio" aria-checked="false" tabindex="-1">
                 <span data-i18n="format.jpg">JPEG — Smaller files, adjustable quality</span>
               </button>
             </div>
@@ -91,13 +90,13 @@
           </h3>
           <div class="control-group__body">
             <div class="seg-control" role="radiogroup" aria-label="Quality">
-              <button class="seg-btn" data-quality="low" role="radio" aria-checked="false" tabindex="-1">
+              <button type="button" class="seg-btn" data-quality="low" role="radio" aria-checked="false" tabindex="-1">
                 <span data-i18n="quality.low">Low — Faster, smaller</span>
               </button>
-              <button class="seg-btn active" data-quality="medium" role="radio" aria-checked="true" tabindex="0">
+              <button type="button" class="seg-btn active" data-quality="medium" role="radio" aria-checked="true" tabindex="0">
                 <span data-i18n="quality.medium">Medium — Balanced</span>
               </button>
-              <button class="seg-btn" data-quality="high" role="radio" aria-checked="false" tabindex="-1">
+              <button type="button" class="seg-btn" data-quality="high" role="radio" aria-checked="false" tabindex="-1">
                 <span data-i18n="quality.high">High — Better quality, larger</span>
               </button>
             </div>
@@ -128,16 +127,16 @@
           </h3>
           <div class="control-group__body">
             <div class="seg-control" role="radiogroup" aria-label="Page selection">
-              <button class="seg-btn active" data-pages="all" role="radio" aria-checked="true" tabindex="0">
+              <button type="button" class="seg-btn active" data-pages="all" role="radio" aria-checked="true" tabindex="0">
                 <span data-i18n="pages.all">All pages</span>
               </button>
-              <button class="seg-btn" data-pages="custom" role="radio" aria-checked="false" tabindex="-1">
+              <button type="button" class="seg-btn" data-pages="custom" role="radio" aria-checked="false" tabindex="-1">
                 <span data-i18n="pages.custom">Selected only</span>
               </button>
             </div>
             <div class="selection-controls">
-              <button class="btn btn--secondary btn-sm" id="btn-select-all">Select all</button>
-              <button class="btn btn--secondary btn-sm" id="btn-deselect-all">Deselect all</button>
+              <button type="button" class="btn btn--secondary btn-sm" id="btn-select-all">Select all</button>
+              <button type="button" class="btn btn--secondary btn-sm" id="btn-deselect-all">Deselect all</button>
             </div>
           </div>
         </div>
@@ -160,14 +159,14 @@
             <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </h3>
           <div class="control-group__body">
-            <button class="btn btn--primary" id="btn-convert" disabled aria-label="Convert to images">
+            <button type="button" class="btn btn--primary" id="btn-convert" disabled aria-label="Convert to images">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                 <path d="M5 3V8M13 3V8M5 8V15L9 13L13 15V8M5 8H13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
               </svg>
               <span data-i18n="btn.convert">Convert to Images</span>
             </button>
 
-            <button class="btn btn--primary" id="btn-download" hidden aria-label="Download images">
+            <button type="button" class="btn btn--primary" id="btn-download" hidden aria-label="Download images">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                 <path d="M9 3V13M9 13L5 9M9 13L13 9M5 15H13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
               </svg>
@@ -197,6 +196,6 @@
   <!-- Screen reader announcements -->
   <div id="sr-live" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0"></div>
 
-  <script type="module" src="/src/main.js"></script>
+  <script type="module" src="./src/main.js"></script>
 </body>
 </html>

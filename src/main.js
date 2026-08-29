@@ -22,6 +22,7 @@ let selectedPagesMode = 'all';
 let selectedScale = 1.5;
 let convertedImages = []; // [{ name, blob, url }]
 let draggedPageId = null;
+let progressBar = null;
 
 // ===== DOM Elements =====
 const dropzone = document.getElementById('dropzone');
@@ -42,6 +43,7 @@ const resultInfo = document.getElementById('result-info');
 const qualityGroup = document.getElementById('quality-group');
 const scaleSelect = document.getElementById('scale-select');
 const srLive = document.getElementById('sr-live');
+progressBar = document.getElementById('progress-bar');
 
 // ===== Helpers =====
 function announce(msg) {
@@ -186,7 +188,7 @@ async function createPageCard(page) {
     card.classList.remove('page-card--drag-over');
   });
 
-  card.addEventListener('drop', (e) => {
+  card.addEventListener('drop', async (e) => {
     e.preventDefault();
     card.classList.remove('page-card--drag-over');
     if (!draggedPageId || draggedPageId === page.id) return;
@@ -198,12 +200,12 @@ async function createPageCard(page) {
     const [moved] = pages.splice(fromIdx, 1);
     pages.splice(toIdx, 0, moved);
 
-    // Re-render in new order
+    // Re-render in new order (sequential to preserve order)
     pagesGrid.innerHTML = '';
-    pages.forEach(async (p) => {
+    for (const p of pages) {
       const newCard = await createPageCard(p);
       pagesGrid.appendChild(newCard);
-    });
+    }
     updatePageNumbers();
     announce(`Page moved to position ${toIdx + 1}`);
   });
@@ -240,6 +242,10 @@ async function convertToImages() {
   resultInfo.hidden = true;
   progressContainer.hidden = false;
 
+  // Revoke object URLs from previous conversions to prevent memory leaks
+  for (const img of convertedImages) {
+    if (img.url) URL.revokeObjectURL(img.url);
+  }
   convertedImages = [];
   const quality = getQualityValue(selectedQuality);
   const scale = selectedScale;
@@ -252,7 +258,17 @@ async function convertToImages() {
     for (let i = 0; i < pagesToConvert.length; i++) {
       const page = pagesToConvert[i];
       const pdfPage = await pdfDoc.getPage(page.pageNum);
-      const viewport = pdfPage.getViewport({ scale });
+      let viewport = pdfPage.getViewport({ scale });
+
+      // Mobile Safari canvas limit: ~16.7 megapixels (4096×4096).
+      // Auto-reduce scale if the canvas would exceed the limit.
+      const MAX_CANVAS_PIXELS = 16700000;
+      let effectiveScale = scale;
+      const totalPixels = Math.ceil(viewport.width) * Math.ceil(viewport.height);
+      if (totalPixels > MAX_CANVAS_PIXELS) {
+        effectiveScale = scale * Math.sqrt(MAX_CANVAS_PIXELS / totalPixels);
+        viewport = pdfPage.getViewport({ scale: effectiveScale });
+      }
 
       const canvas = document.createElement('canvas');
       canvas.width = Math.ceil(viewport.width);
@@ -313,7 +329,7 @@ async function convertToImages() {
   }
 }
 
-function downloadResults() {
+async function downloadResults() {
   if (convertedImages.length === 0) return;
 
   if (convertedImages.length === 1) {
@@ -322,17 +338,21 @@ function downloadResults() {
   }
 
   // Convert blobs to Uint8Array then create ZIP via fflate
-  Promise.all(
-    convertedImages.map(async (img) => ({
-      name: img.name,
-      data: new Uint8Array(await img.blob.arrayBuffer()),
-    })),
-  ).then((items) => {
+  try {
+    const items = await Promise.all(
+      convertedImages.map(async (img) => ({
+        name: img.name,
+        data: new Uint8Array(await img.blob.arrayBuffer()),
+      })),
+    );
     const z = {};
     for (const item of items) z[item.name] = item.data;
     const zipBlob = new Blob([zipSync(z)], { type: 'application/zip' });
     downloadBlob(zipBlob, `${pdfFile.name.replace(/\.pdf$/i, '')}_images.zip`);
-  });
+  } catch (err) {
+    console.error('ZIP creation error:', err);
+    announce(t('alerts.error', { msg: err.message }));
+  }
 }
 
 // ===== Reset =====
@@ -374,8 +394,11 @@ dropzone.addEventListener('dragover', (e) => {
   e.preventDefault();
   dropzone.classList.add('dropzone--active');
 });
-dropzone.addEventListener('dragleave', () => {
-  dropzone.classList.remove('dropzone--active');
+dropzone.addEventListener('dragleave', (e) => {
+  // Only deactivate when leaving the dropzone itself (not child elements)
+  if (e.target === dropzone) {
+    dropzone.classList.remove('dropzone--active');
+  }
 });
 dropzone.addEventListener('drop', (e) => {
   e.preventDefault();
@@ -398,6 +421,42 @@ function handleFileSelect(file) {
   loadPdf(file).catch((err) => {
     console.error(err);
     announce(t('alerts.error', { msg: err.message }));
+  });
+}
+
+// ===== Radio group keyboard navigation (arrow keys) =====
+/**
+ * WAI-ARIA radiogroup pattern: Arrow Up/Left = previous, Arrow Down/Right = next,
+ * Home = first, End = last. The active radio receives tabindex=0, others tabindex=-1.
+ */
+function setupRadioGroupKeyboard(selector) {
+  document.querySelectorAll(selector).forEach((group) => {
+    const radios = Array.from(group.querySelectorAll('[role="radio"]'));
+    if (radios.length === 0) return;
+
+    group.addEventListener('keydown', (e) => {
+      const currentIdx = radios.findIndex((r) => r.getAttribute('aria-checked') === 'true');
+      let newIdx = currentIdx;
+
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        newIdx = (currentIdx + 1) % radios.length;
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        newIdx = (currentIdx - 1 + radios.length) % radios.length;
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        newIdx = 0;
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        newIdx = radios.length - 1;
+      }
+
+      if (newIdx !== currentIdx) {
+        radios[newIdx].focus();
+        radios[newIdx].click();
+      }
+    });
   });
 }
 
@@ -446,6 +505,9 @@ document.querySelectorAll('[data-pages]').forEach((btn) => {
     selectedPagesMode = btn.dataset.pages;
   });
 });
+
+// Enable arrow-key navigation for all radiogroups
+setupRadioGroupKeyboard('[role="radiogroup"]');
 
 // Scale selector
 scaleSelect.addEventListener('change', () => {
