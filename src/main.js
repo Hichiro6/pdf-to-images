@@ -72,6 +72,10 @@ async function loadPdf(file) {
   filenameEl.textContent = file.name;
 
   const arrayBuffer = await file.arrayBuffer();
+  // Free memory from any previously loaded document
+  if (pdfDoc) {
+    pdfDoc.destroy().catch(() => {});
+  }
   pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
 
   pages = [];
@@ -360,6 +364,11 @@ function reset() {
   // Cleanup
   for (const img of convertedImages) {
     if (img.url) URL.revokeObjectURL(img.url);
+  }
+
+  // Destroy the PDF.js document to free its worker memory
+  if (pdfDoc) {
+    pdfDoc.destroy().catch(() => {});
   }
 
   pdfFile = null;

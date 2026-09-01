@@ -10,12 +10,11 @@
  * - Checkboxes individuelles de pages
  * - Sections repliables (collapsible)
  */
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { createTestPdf } from './helpers/test-fixtures-gen.js';
-import { uploadTestPdf, waitForThumbnails, getPageCardCount } from './helpers/test-utils.js';
+import { uploadTestPdf } from './helpers/test-utils.js';
 
 test.describe('🎛️ Contrôles UI - Format, Qualité, Échelle, Pages', () => {
-
   test.beforeAll(async () => {
     await createTestPdf({ pages: 3, text: 'Controls Test', filename: 'controls-test.pdf' });
   });
@@ -73,7 +72,7 @@ test.describe('🎛️ Contrôles UI - Format, Qualité, Échelle, Pages', () =>
     await expect(lowBtn).not.toHaveClass(/active/);
   });
 
-  test('Sélecteur d\'échelle: valeurs disponibles et changement', async ({ page }) => {
+  test("Sélecteur d'échelle: valeurs disponibles et changement", async ({ page }) => {
     await uploadTestPdf(page, 'controls-test.pdf');
 
     const scaleSelect = page.locator('#scale-select');

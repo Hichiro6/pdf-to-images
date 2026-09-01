@@ -18,7 +18,9 @@ describe('i18n - Core functions', () => {
 
   it('falls back to English string when switching to unknown lang', () => {
     setLanguage('xx');
-    expect(t('app.title')).toBe(TRANSLATIONS.en['app.title'] || 'PDF to Images — Convert your PDF to images');
+    expect(t('app.title')).toBe(
+      TRANSLATIONS.en['app.title'] || 'PDF to Images — Convert your PDF to images',
+    );
     // Restore
     setLanguage('en');
   });

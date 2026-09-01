@@ -11,12 +11,11 @@
  * - Conversion avec échelles différentes
  * - Conversion désactivée pendant traitement (isConverting)
  */
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { createTestPdf } from './helpers/test-fixtures-gen.js';
-import { uploadTestPdf, waitForConversion, getPageCardCount } from './helpers/test-utils.js';
+import { uploadTestPdf, waitForConversion } from './helpers/test-utils.js';
 
 test.describe('🔄 Processus de conversion', () => {
-
   test.beforeAll(async () => {
     await createTestPdf({ pages: 3, text: 'Conversion Test', filename: 'conversion-test.pdf' });
     await createTestPdf({ pages: 1, text: 'Single Page Test', filename: 'single-page.pdf' });
@@ -161,7 +160,7 @@ test.describe('🔄 Processus de conversion', () => {
 
     // Verify downloaded file is not empty
     const path = await download.path();
-    const fs = await import('fs');
+    const fs = await import('node:fs');
     if (path && fs.existsSync(path)) {
       const stats = fs.statSync(path);
       expect(stats.size).toBeGreaterThan(1000);

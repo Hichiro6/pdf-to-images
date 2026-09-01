@@ -8,16 +8,16 @@
  * - Format non supporté → refusé
  * - Drag & drop fonctionne
  */
-import { test, expect } from '@playwright/test';
-import path from 'path';
-import fs from 'fs';
-import { createTestPdf, createInvalidFile } from './helpers/test-fixtures-gen.js';
-import { uploadTestPdf, waitForThumbnails, getPageCardCount } from './helpers/test-utils.js';
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect, test } from '@playwright/test';
+import { createInvalidFile, createTestPdf } from './helpers/test-fixtures-gen.js';
+import { getPageCardCount, uploadTestPdf, waitForThumbnails } from './helpers/test-utils.js';
 
 const fixturesDir = path.join(process.cwd(), 'tests/e2e/fixtures');
 
 test.describe('📤 Upload et chargement PDF', () => {
-
   test.beforeAll(async () => {
     // Ensure fixtures exist
     fs.mkdirSync(fixturesDir, { recursive: true });
@@ -79,7 +79,7 @@ test.describe('📤 Upload et chargement PDF', () => {
 
     // Verify each image has dimensions
     for (let i = 0; i < 2; i++) {
-      const naturalWidth = await imgs.nth(i).evaluate(el => el.naturalWidth);
+      const naturalWidth = await imgs.nth(i).evaluate((el) => el.naturalWidth);
       expect(naturalWidth, `Thumbnail ${i + 1} should have naturalWidth > 0`).toBeGreaterThan(0);
     }
   });

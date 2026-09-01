@@ -13,9 +13,6 @@
       "type": "image/svg+xml"
     }
   ],
-  "categories": [
-    "productivity",
-    "utilities"
-  ],
+  "categories": ["productivity", "utilities"],
   "lang": "en-US"
 }

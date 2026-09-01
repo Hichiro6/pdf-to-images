@@ -11,17 +11,17 @@
  * - Pas de fuite: URLs révoquées après reset
  * - Workflow complet: upload → convert → download → reset → re-upload
  */
-import { test, expect } from '@playwright/test';
-import path from 'path';
-import fs from 'fs';
-import { createTestPdf, createRichPdf } from './helpers/test-fixtures-gen.js';
-import { uploadTestPdf, waitForConversion, getPageCardCount } from './helpers/test-utils.js';
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect, test } from '@playwright/test';
+import { createRichPdf, createTestPdf } from './helpers/test-fixtures-gen.js';
+import { getPageCardCount, uploadTestPdf, waitForConversion } from './helpers/test-utils.js';
 
 const fixturesDir = path.join(process.cwd(), 'tests/e2e/fixtures');
 const downloadDir = path.join(process.cwd(), 'tests/e2e/downloads');
 
 test.describe('🛡️ Non-régression', () => {
-
   test.beforeAll(async () => {
     fs.mkdirSync(fixturesDir, { recursive: true });
     fs.mkdirSync(downloadDir, { recursive: true });
@@ -40,7 +40,9 @@ test.describe('🛡️ Non-régression', () => {
 
     // No download possible
     let downloadTriggered = false;
-    page.on('download', () => { downloadTriggered = true; });
+    page.on('download', () => {
+      downloadTriggered = true;
+    });
 
     await page.waitForTimeout(500);
     expect(downloadTriggered).toBeFalsy();
@@ -54,7 +56,9 @@ test.describe('🛡️ Non-régression', () => {
 
     // No download should trigger
     let downloadTriggered = false;
-    page.on('download', () => { downloadTriggered = true; });
+    page.on('download', () => {
+      downloadTriggered = true;
+    });
 
     await page.waitForTimeout(500);
     expect(downloadTriggered).toBeFalsy();
@@ -110,14 +114,14 @@ test.describe('🛡️ Non-régression', () => {
 
     // Verify ZIP contains 3 files with correct naming order
     const AdmZip = await import('adm-zip').catch(() => null);
-    if (AdmZip && AdmZip.default) {
+    if (AdmZip?.default) {
       const zip = new AdmZip.default(savePath);
-      const entries = zip.getEntries().map(e => e.entryName);
+      const entries = zip.getEntries().map((e) => e.entryName);
       expect(entries.length).toBe(3);
       // Files should be named _page_01, _page_02, _page_03
-      expect(entries.some(e => e.includes('_page_01'))).toBeTruthy();
-      expect(entries.some(e => e.includes('_page_02'))).toBeTruthy();
-      expect(entries.some(e => e.includes('_page_03'))).toBeTruthy();
+      expect(entries.some((e) => e.includes('_page_01'))).toBeTruthy();
+      expect(entries.some((e) => e.includes('_page_02'))).toBeTruthy();
+      expect(entries.some((e) => e.includes('_page_03'))).toBeTruthy();
     } else {
       // Fallback: just verify file exists and is a valid ZIP
       expect(fs.existsSync(savePath)).toBeTruthy();
@@ -129,7 +133,9 @@ test.describe('🛡️ Non-régression', () => {
     }
 
     // Cleanup
-    try { fs.unlinkSync(savePath); } catch {}
+    try {
+      fs.unlinkSync(savePath);
+    } catch {}
   });
 
   test('i18n: locale FR appliquée (texte en français)', async ({ page }) => {
@@ -152,10 +158,10 @@ test.describe('🛡️ Non-régression', () => {
     const consoleErrors = [];
     const pageErrors = [];
 
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
-    page.on('pageerror', err => pageErrors.push(err.message));
+    page.on('pageerror', (err) => pageErrors.push(err.message));
 
     const pdfPath = path.join(fixturesDir, 'regression-test.pdf');
     await page.setInputFiles('#file-input', pdfPath);
@@ -163,9 +169,8 @@ test.describe('🛡️ Non-régression', () => {
     await expect(page.locator('#workspace')).toBeVisible({ timeout: 15000 });
     await page.waitForTimeout(2000);
 
-    const criticalErrors = consoleErrors.filter(e =>
-      !e.includes('SW registration') &&
-      !e.includes('Service Worker')
+    const criticalErrors = consoleErrors.filter(
+      (e) => !e.includes('SW registration') && !e.includes('Service Worker'),
     );
 
     expect(criticalErrors, `Console errors: ${criticalErrors.join(', ')}`).toHaveLength(0);
@@ -225,7 +230,9 @@ test.describe('🛡️ Non-régression', () => {
     expect(fs.existsSync(savePath)).toBeTruthy();
     expect(fs.statSync(savePath).size).toBeGreaterThan(100);
 
-    try { fs.unlinkSync(savePath); } catch {}
+    try {
+      fs.unlinkSync(savePath);
+    } catch {}
   });
 
   test("Conversion puis reset: pas de fuite d'URLs (pas d'erreur)", async ({ page }) => {

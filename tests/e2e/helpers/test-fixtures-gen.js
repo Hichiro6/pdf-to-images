@@ -2,8 +2,8 @@
  * Test fixtures generator for PDF-to-Images E2E tests
  * Generates PDFs with pdf-lib (no external dependencies needed)
  */
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 const fixturesDir = path.join(process.cwd(), 'tests/e2e/fixtures');
@@ -17,11 +17,7 @@ const fixturesDir = path.join(process.cwd(), 'tests/e2e/fixtures');
  * @returns {Promise<string>} - Path to the created PDF file
  */
 export async function createTestPdf(options = {}) {
-  const {
-    pages = 1,
-    filename = 'test-document.pdf',
-    text = 'Test Document',
-  } = options;
+  const { pages = 1, filename = 'test-document.pdf', text = 'Test Document' } = options;
 
   const pdfDoc = await PDFDocument.create();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -29,12 +25,18 @@ export async function createTestPdf(options = {}) {
   for (let i = 0; i < pages; i++) {
     const page = pdfDoc.addPage([595, 842]); // A4
     page.drawText(`${text} - Page ${i + 1}`, {
-      x: 50, y: 780, size: 24, font,
+      x: 50,
+      y: 780,
+      size: 24,
+      font,
       color: rgb(0, 0, 0),
     });
     for (let j = 0; j < 20; j++) {
       page.drawText(`Line ${j + 1}: Lorem ipsum dolor sit amet.`, {
-        x: 50, y: 740 - j * 20, size: 12, font,
+        x: 50,
+        y: 740 - j * 20,
+        size: 12,
+        font,
         color: rgb(0.3, 0.3, 0.3),
       });
     }
@@ -53,7 +55,11 @@ export async function createTestPdf(options = {}) {
  * @returns {Promise<string>} - Path to the created PDF
  */
 export async function createMultiPagePdf(numPages = 5) {
-  return createTestPdf({ pages: numPages, filename: 'multi-page-test.pdf', text: 'Multi Page Test' });
+  return createTestPdf({
+    pages: numPages,
+    filename: 'multi-page-test.pdf',
+    text: 'Multi Page Test',
+  });
 }
 
 /**
@@ -70,10 +76,7 @@ export async function createLongPdf() {
  * @returns {Promise<string>} - Path to the created PDF
  */
 export async function createRichPdf(options = {}) {
-  const {
-    pages = 3,
-    filename = 'rich-content.pdf',
-  } = options;
+  const { pages = 3, filename = 'rich-content.pdf' } = options;
 
   const pdfDoc = await PDFDocument.create();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -84,13 +87,19 @@ export async function createRichPdf(options = {}) {
 
     // Title
     page.drawText(`Document Riche - Page ${i + 1}`, {
-      x: 50, y: 800, size: 28, font: boldFont,
+      x: 50,
+      y: 800,
+      size: 28,
+      font: boldFont,
       color: rgb(0, 0, 0),
     });
 
     // Rectangle border
     page.drawRectangle({
-      x: 40, y: 40, width: 515, height: 762,
+      x: 40,
+      y: 40,
+      width: 515,
+      height: 762,
       borderColor: rgb(0.5, 0.5, 0.5),
       borderWidth: 1,
     });
@@ -98,18 +107,25 @@ export async function createRichPdf(options = {}) {
     // Content lines
     for (let j = 0; j < 25; j++) {
       page.drawText(`Ligne ${j + 1}: Contenu varie pour tester la conversion.`, {
-        x: 50, y: 750 - j * 25, size: 11, font,
+        x: 50,
+        y: 750 - j * 25,
+        size: 11,
+        font,
         color: rgb(0.2, 0.2, 0.2),
       });
     }
 
     // Draw some shapes
     page.drawCircle({
-      x: 500, y: 700, size: 30,
+      x: 500,
+      y: 700,
+      size: 30,
       color: rgb(0.8, 0.2, 0.2),
     });
     page.drawSquare({
-      x: 450, y: 600, size: 40,
+      x: 450,
+      y: 600,
+      size: 40,
       color: rgb(0.2, 0.6, 0.8),
     });
   }
@@ -143,7 +159,11 @@ export async function generateAllFixtures() {
   fs.mkdirSync(fixturesDir, { recursive: true });
 
   const files = {
-    testPdf: await createTestPdf({ pages: 2, text: 'Test PDF Document', filename: 'test-document.pdf' }),
+    testPdf: await createTestPdf({
+      pages: 2,
+      text: 'Test PDF Document',
+      filename: 'test-document.pdf',
+    }),
     multiPagePdf: await createMultiPagePdf(5),
     longPdf: await createLongPdf(),
     richPdf: await createRichPdf({ pages: 3 }),

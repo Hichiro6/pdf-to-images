@@ -9,17 +9,17 @@
  * - Téléchargement après conversion JPEG
  * - Pas d'erreurs console pendant download
  */
-import { test, expect } from '@playwright/test';
-import path from 'path';
-import fs from 'fs';
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect, test } from '@playwright/test';
 import { createTestPdf } from './helpers/test-fixtures-gen.js';
 import { uploadTestPdf, waitForConversion } from './helpers/test-utils.js';
 
-const fixturesDir = path.join(process.cwd(), 'tests/e2e/fixtures');
+const _fixturesDir = path.join(process.cwd(), 'tests/e2e/fixtures');
 const downloadDir = path.join(process.cwd(), 'tests/e2e/downloads');
 
 test.describe('⬇️ Téléchargement', () => {
-
   test.beforeAll(async () => {
     fs.mkdirSync(downloadDir, { recursive: true });
     await createTestPdf({ pages: 2, text: 'Download PDF Test', filename: 'download-test.pdf' });
@@ -89,7 +89,7 @@ test.describe('⬇️ Téléchargement', () => {
     fs.closeSync(fd);
 
     expect(buffer[0]).toBe(0x50); // P
-    expect(buffer[1]).toBe(0x4B); // K
+    expect(buffer[1]).toBe(0x4b); // K
     expect(buffer[2]).toBe(0x03);
     expect(buffer[3]).toBe(0x04);
   });
@@ -120,9 +120,9 @@ test.describe('⬇️ Téléchargement', () => {
     fs.readSync(fd, buffer, 0, 3, 0);
     fs.closeSync(fd);
 
-    expect(buffer[0]).toBe(0xFF);
-    expect(buffer[1]).toBe(0xD8);
-    expect(buffer[2]).toBe(0xFF);
+    expect(buffer[0]).toBe(0xff);
+    expect(buffer[1]).toBe(0xd8);
+    expect(buffer[2]).toBe(0xff);
 
     // Filename should end with .jpg
     const filename = download.suggestedFilename();
@@ -143,16 +143,16 @@ test.describe('⬇️ Téléchargement', () => {
     expect(filename).toContain('download-single');
   });
 
-  test('Pas d\'erreurs console pendant conversion + download', async ({ page }) => {
+  test("Pas d'erreurs console pendant conversion + download", async ({ page }) => {
     await uploadTestPdf(page, 'download-single.pdf');
 
     const consoleErrors = [];
     const pageErrors = [];
 
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
-    page.on('pageerror', err => pageErrors.push(err.message));
+    page.on('pageerror', (err) => pageErrors.push(err.message));
 
     // Full flow: convert → download
     await page.click('#btn-convert');
@@ -165,10 +165,11 @@ test.describe('⬇️ Téléchargement', () => {
     await page.waitForTimeout(1000);
 
     // Filter out expected/non-critical errors
-    const criticalErrors = consoleErrors.filter(e =>
-      !e.includes('SW registration') &&
-      !e.includes('Service Worker') &&
-      !e.includes('NotReadableError')
+    const criticalErrors = consoleErrors.filter(
+      (e) =>
+        !e.includes('SW registration') &&
+        !e.includes('Service Worker') &&
+        !e.includes('NotReadableError'),
     );
 
     expect(criticalErrors, `Console errors: ${criticalErrors.join(', ')}`).toHaveLength(0);

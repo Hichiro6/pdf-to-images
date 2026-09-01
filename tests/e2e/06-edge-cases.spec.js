@@ -11,57 +11,58 @@
  * - Fichier corrompu → message d'erreur approprié
  * - Timeout conversion (>30s) → gestion graceful
  */
-import { test, expect } from '@playwright/test';
-import fs from 'fs';
-import path from 'path';
-import { createTestPdf, createMultiPagePdf } from './helpers/test-fixtures-gen.js';
-import { uploadTestPdf, waitForConversion, getPageCardCount } from './helpers/test-utils.js';
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { expect, test } from '@playwright/test';
+import { createMultiPagePdf, createTestPdf } from './helpers/test-fixtures-gen.js';
+import { getPageCardCount, uploadTestPdf } from './helpers/test-utils.js';
 
 const fixturesDir = path.join(process.cwd(), 'tests/e2e/fixtures');
 
 test.describe('🔮 Edge Cases & Validation', () => {
-
   test.beforeAll(async () => {
     fs.mkdirSync(fixturesDir, { recursive: true });
-    
+
     // Create test files
     await createTestPdf({ pages: 1, text: 'Valid PDF', filename: 'valid.pdf' });
     await createMultiPagePdf(60, 'large.pdf'); // 60 pages
-    
+
     // Create invalid files (non-PDF)
     const txtPath = path.join(fixturesDir, 'invalid.txt');
     fs.writeFileSync(txtPath, 'This is not a PDF');
-    
+
     const jpgPath = path.join(fixturesDir, 'fake.jpg');
     fs.writeFileSync(jpgPath, '\xFF\xD8\xFF\xE0' + 'fake jpg data');
   });
 
-  test('Upload de fichier .txt → message d\'erreur', async ({ page }) => {
+  test("Upload de fichier .txt → message d'erreur", async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('#dropzone', { timeout: 10000 });
 
     const txtPath = path.join(fixturesDir, 'invalid.txt');
-    
+
     const consoleLogs = [];
-    page.on('console', msg => consoleLogs.push(msg.text()));
+    page.on('console', (msg) => consoleLogs.push(msg.text()));
 
     await page.setInputFiles('#file-input', txtPath);
     await page.waitForTimeout(1000);
 
     // Should show error or revert to initial state
-    const hasError = consoleLogs.some(log => 
-      log.toLowerCase().includes('pdf') || 
-      log.toLowerCase().includes('erreur') ||
-      log.toLowerCase().includes('error')
+    const hasError = consoleLogs.some(
+      (log) =>
+        log.toLowerCase().includes('pdf') ||
+        log.toLowerCase().includes('erreur') ||
+        log.toLowerCase().includes('error'),
     );
-    
+
     // Workspace should remain hidden
     await expect(page.locator('#workspace')).toBeHidden();
-    
+
     expect(hasError || true, 'Expected error handling').toBeTruthy();
   });
 
-  test('Upload PDF invalide/corrompu → message d\'erreur', async ({ page }) => {
+  test("Upload PDF invalide/corrompu → message d'erreur", async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('#dropzone', { timeout: 10000 });
 
@@ -70,13 +71,16 @@ test.describe('🔮 Edge Cases & Validation', () => {
     fs.writeFileSync(corruptPath, '%PDF-1.4\nCorrupted data here');
 
     const consoleLogs = [];
-    page.on('console', msg => consoleLogs.push(msg.text()));
+    page.on('console', (msg) => consoleLogs.push(msg.text()));
 
     await page.setInputFiles('#file-input', corruptPath);
     await page.waitForTimeout(1000);
 
     // Workspace should remain hidden or show error
-    const workspaceVisible = await page.locator('#workspace').isVisible().catch(() => false);
+    const workspaceVisible = await page
+      .locator('#workspace')
+      .isVisible()
+      .catch(() => false);
     expect(workspaceVisible).toBeFalsy();
   });
 
@@ -90,12 +94,12 @@ test.describe('🔮 Edge Cases & Validation', () => {
 
     // Scroll through the list
     const grid = page.locator('#pages-grid');
-    await grid.evaluate(el => el.scrollTop = 1000);
+    await grid.evaluate((el) => (el.scrollTop = 1000));
     await page.waitForTimeout(500);
-    await grid.evaluate(el => el.scrollTop = 0);
+    await grid.evaluate((el) => (el.scrollTop = 0));
   });
 
-  test('Drag & Drop de page réorganise l\'ordre', async ({ page }) => {
+  test("Drag & Drop de page réorganise l'ordre", async ({ page }) => {
     await uploadTestPdf(page, 'valid.pdf');
 
     const firstCard = page.locator('.page-card').first();
@@ -116,18 +120,18 @@ test.describe('🔮 Edge Cases & Validation', () => {
     await page.waitForSelector('#dropzone', { timeout: 10000 });
 
     const fileInput = page.locator('#file-input');
-    
+
     // Input should be hidden
-    await expect(fileInput).toHaveCSS('display', 'none').or(
-      expect(fileInput).toHaveCSS('visibility', 'hidden')
-    );
+    await expect(fileInput)
+      .toHaveCSS('display', 'none')
+      .or(expect(fileInput).toHaveCSS('visibility', 'hidden'));
 
     // Clicking dropzone triggers file input
     await page.click('#dropzone');
-    
+
     // Should focus (harder to verify directly, so we check the event was triggered)
     await page.waitForTimeout(200);
-    
+
     // The file input should be ready to receive files
     expect(fileInput).toBeDefined();
   });
@@ -160,7 +164,7 @@ test.describe('🔮 Edge Cases & Validation', () => {
     await expect(page.locator('[data-format="png"]')).toHaveClass(/active/);
   });
 
-  test('Sélection d\'échelle avec qualité JPEG', async ({ page }) => {
+  test("Sélection d'échelle avec qualité JPEG", async ({ page }) => {
     await uploadTestPdf(page, 'valid.pdf');
 
     // Switch to JPEG
@@ -169,7 +173,7 @@ test.describe('🔮 Edge Cases & Validation', () => {
 
     // Change scale
     const scaleSelect = page.locator('#scale-select');
-    
+
     await scaleSelect.selectOption('1');
     expect(await scaleSelect.inputValue()).toBe('1');
 
@@ -201,9 +205,7 @@ test.describe('🔮 Edge Cases & Validation', () => {
 
     // SR live region should exist
     const srLive = page.locator('#sr-live');
-    await expect(srLive).toBeVisible({ visible: false }).or(
-      expect(srLive).toBeInViewport()
-    );
+    await expect(srLive).toBeVisible({ visible: false }).or(expect(srLive).toBeInViewport());
 
     // Should have proper role
     const role = await srLive.getAttribute('role');
@@ -225,7 +227,7 @@ test.describe('🔮 Edge Cases & Validation', () => {
 
   test('Responsive: toggle des sections sur petits écrans', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 }); // Mobile
-    
+
     await page.goto('/');
     await page.waitForSelector('#dropzone', { timeout: 10000 });
 

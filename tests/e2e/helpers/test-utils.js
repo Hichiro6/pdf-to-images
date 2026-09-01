@@ -4,7 +4,7 @@
  * wait for workspace to appear, and interact with page thumbnails.
  */
 
-import path from 'path';
+import path from 'node:path';
 
 const fixturesDir = path.join(process.cwd(), 'tests/e2e/fixtures');
 
@@ -56,7 +56,7 @@ export async function waitForThumbnails(page, timeout = 20000) {
       });
     },
     null,
-    { timeout }
+    { timeout },
   );
 }
 
@@ -68,7 +68,9 @@ export async function waitForThumbnails(page, timeout = 20000) {
  */
 export async function waitForConversion(page, timeout = 30000) {
   // Wait for progress container to become visible (conversion started)
-  await page.waitForSelector('#progress-container:not([hidden])', { timeout: 5000 }).catch(() => {});
+  await page
+    .waitForSelector('#progress-container:not([hidden])', { timeout: 5000 })
+    .catch(() => {});
 
   // Wait for download button to become visible (conversion complete)
   await page.waitForSelector('#btn-download:not([hidden])', { timeout });
