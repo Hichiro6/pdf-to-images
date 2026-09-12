@@ -14,6 +14,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 // ===== State =====
 let pdfFile = null;
 let pdfDoc = null;
+let pdfjsLoadingTask = null; // PDF.js loading task (owns .destroy())
 let pages = []; // [{ id, pageNum, selected, thumbnail }]
 let isConverting = false;
 let selectedFormat = 'png';
@@ -73,10 +74,11 @@ async function loadPdf(file) {
 
   const arrayBuffer = await file.arrayBuffer();
   // Free memory from any previously loaded document
-  if (pdfDoc) {
-    pdfDoc.destroy().catch(() => {});
+  if (pdfjsLoadingTask) {
+    pdfjsLoadingTask.destroy().catch(() => {});
   }
-  pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+  pdfjsLoadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
+  pdfDoc = await pdfjsLoadingTask.promise;
 
   pages = [];
   const totalPages = pdfDoc.numPages;
@@ -367,12 +369,13 @@ function reset() {
   }
 
   // Destroy the PDF.js document to free its worker memory
-  if (pdfDoc) {
-    pdfDoc.destroy().catch(() => {});
+  if (pdfjsLoadingTask) {
+    pdfjsLoadingTask.destroy().catch(() => {});
   }
 
   pdfFile = null;
   pdfDoc = null;
+  pdfjsLoadingTask = null;
   pages = [];
   convertedImages = [];
   isConverting = false;
